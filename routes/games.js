@@ -1,13 +1,36 @@
 const express = require('express');
-const { route } = require('.');
 const router = express.Router();
+const promisePool = require('../utils/db');
 
 // GET home page.
-router.get('/', function (req, res) {
-    res.json({ msg: 'success', games: [] });
+router.get('/', async (req, res) => {
+    const { type, year, classid, limit } = req.query;
+    const errors = [];
+
+    const validLimit = parseInt(limit) || 10;
+
+    try {
+        const [rows] = promisePool.query(sql);
+
+        if (rows.length > 0) {
+            return res.json({ msg: 'success', url: req.originalUrl, games: rows, errors });
+        } 
+    } catch (error) {
+        console.log(error);
+        return res.status(500).json({
+            msg: 'fail',
+            url: req.originalUrl,
+            errors: [{ msg: 'internal server error' }],
+        });
+    }
+    return res.status(404).json({
+        msg: 'fail',
+        url: req.originalUrl,
+        errors: [{ msg: 'games not found' }],
+    });
 });
 
-router.get('/:gameId', function (req, res) {
+router.get('/:gameId', async (req, res) => {
     const { gameId } = req.params;
     const errors = [];
     if (gameId === undefined) {
