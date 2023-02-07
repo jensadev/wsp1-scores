@@ -1,33 +1,39 @@
 const express = require('express');
 const router = express.Router();
-const promisePool = require('../utils/db');
+
+const { PrismaClient } = require('@prisma/client');
+
+const prisma = new PrismaClient();
+
+const getAllGames = async () => {
+    const allGames = await prisma.game.findMany();
+    console.log(allGames)
+    return allGames;
+};
 
 // GET home page.
 router.get('/', async (req, res) => {
     const { type, year, classid, limit } = req.query;
     const errors = [];
 
-    const validLimit = parseInt(limit) || 10;
-
-    try {
-        const [rows] = promisePool.query(sql);
-
-        if (rows.length > 0) {
-            return res.json({ msg: 'success', url: req.originalUrl, games: rows, errors });
-        } 
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({
-            msg: 'fail',
-            url: req.originalUrl,
-            errors: [{ msg: 'internal server error' }],
+    getAllGames()
+        .then(async (games) => {
+            await prisma.$disconnect();
+            return res.json({
+                msg: 'success',
+                url: req.originalUrl,
+                games: games,
+            });
+        })
+        .catch(async (e) => {
+            console.error(e);
+            await prisma.$disconnect();
+            return res.status(500).json({
+                msg: 'fail',
+                url: req.originalUrl,
+                errors: [{ msg: 'internal server error' }],
+            });
         });
-    }
-    return res.status(404).json({
-        msg: 'fail',
-        url: req.originalUrl,
-        errors: [{ msg: 'games not found' }],
-    });
 });
 
 router.get('/:gameId', async (req, res) => {

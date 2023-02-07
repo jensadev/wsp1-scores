@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const promisePool = require('../utils/db');
 
 // GET home page
 router.get('/', (req, res) => {
