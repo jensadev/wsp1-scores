@@ -7,7 +7,6 @@ const prisma = new PrismaClient();
 
 const getAllGames = async () => {
     const allGames = await prisma.game.findMany();
-    console.log(allGames)
     return allGames;
 };
 
