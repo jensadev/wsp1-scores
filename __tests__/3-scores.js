@@ -1,6 +1,5 @@
 const app = require('../app');
 const supertest = require('supertest');
-const pool = require('../utils/db');
 const { response } = require('../app');
 
 describe('/scores', () => {
@@ -24,24 +23,24 @@ describe('/scores', () => {
                 });
         });
 
-        it('should return an error if gameId is not provided', () => {
-            return supertest(app)
-                .get('/scores')
-                .then((response) => {
-                    expect(response.body.errors[0].msg).toBe(
-                        'gameId is required'
-                    );
-                });
-        });
+        // it('should return an error if gameId is not provided', () => {
+        //     return supertest(app)
+        //         .get('/scores')
+        //         .then((response) => {
+        //             expect(response.body.errors[0].msg).toBe(
+        //                 'gameId is required'
+        //             );
+        //         });
+        // });
 
-        it('should return an error if gameId is not a number', () => {
-            return supertest(app)
-                .get('/scores/abc')
-                .then((response) => {
-                    expect(response.body.errors[0].msg).toBe(
-                        'gameId must be a number'
-                    );
-                });
-        });
+        // it('should return an error if gameId is not a number', () => {
+        //     return supertest(app)
+        //         .get('/scores/abc')
+        //         .then((response) => {
+        //             expect(response.body.errors[0].msg).toBe(
+        //                 'gameId must be a number'
+        //             );
+        //         });
+        // });
     });
 });

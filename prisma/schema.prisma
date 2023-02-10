@@ -1,81 +1,162 @@
 generator client {
-  provider = "prisma-client-js"
+    provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
-}
-
-model GamesUsers {
-  id     Int  @id @unique(map: "id") @default(autoincrement()) @db.UnsignedInt
-  gameId Int? @db.UnsignedInt
-  userId Int? @db.UnsignedInt
-  Games  Game?   @relation(fields: [gameId], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "GamesUsers_ibfk_1")
-  Users  User?   @relation(fields: [userId], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "GamesUsers_ibfk_2")
-
-  @@index([gameId], map: "gameId")
-  @@index([userId], map: "userId")
-}
-
-model Class {
-  id           Int         @id @unique(map: "id") @default(autoincrement()) @db.UnsignedInt
-  name         String         @db.VarChar(4)
-  UsersClasses UsersClasses[]
+    provider = "mysql"
+    url      = env("DATABASE_URL")
 }
 
 model Game {
-  id          Int       @id @unique(map: "id") @default(autoincrement()) @db.UnsignedInt
-  title       String       @db.VarChar(200)
-  url         String       @db.VarChar(255)
-  git         String       @db.VarChar(255)
-  year        Int
-  description String?      @db.Text
-  cover       String?      @db.VarChar(255)
-  createdAt   DateTime     @default(now()) @db.Timestamp(0)
-  updatedAt   DateTime     @default(now()) @db.Timestamp(0)
-  GamesUsers  GamesUsers[]
-  Score       Score[]
+    id          Int           @id @unique(map: "id") @default(autoincrement()) @db.UnsignedInt
+    title       String        @db.VarChar(200)
+    url         String        @db.VarChar(255)
+    git         String        @db.VarChar(255)
+    year        Int
+    description String?       @db.Text
+    cover       String?       @db.VarChar(255)
+    createdAt   DateTime      @default(now()) @db.Timestamp(0)
+    updatedAt   DateTime      @default(now()) @db.Timestamp(0)
+    users       GameUsers[]
+    types       GameTypes[]
+    scores      Score[]
+    classes     GameClasses[]
 }
 
-model GamesTypes {
-  id     Int  @id @unique(map: "id") @default(autoincrement()) @db.UnsignedInt
-  gameId Int? @db.UnsignedInt
-  typeId Int? @db.UnsignedInt
-}
-
-model Score {
-  id        Int   @id @unique(map: "id") @default(autoincrement()) @db.UnsignedInt
-  gameId    Int   @db.UnsignedInt
-  score     Int      @default(0)
-  handle    String?  @db.VarChar(6)
-  createdAt DateTime @default(now()) @db.Timestamp(0)
-  updatedAt DateTime @default(now()) @db.Timestamp(0)
-  Game      Game     @relation(fields: [gameId], references: [id], onDelete: Cascade, map: "Score_ibfk_1")
-
-  @@index([gameId], map: "gameId")
-}
-
-model Type {
-  id   Int  @id @unique(map: "id") @default(autoincrement()) @db.UnsignedInt
-  type String? @db.VarChar(200)
+model GameUsers {
+    id     Int  @id @unique(map: "id") @default(autoincrement()) @db.UnsignedInt
+    game   Game @relation(fields: [gameId], references: [id])
+    user   User @relation(fields: [userId], references: [id])
+    gameId Int  @db.UnsignedInt
+    userId Int  @db.UnsignedInt
 }
 
 model User {
-  id           Int         @id @unique(map: "id") @default(autoincrement()) @db.UnsignedInt
-  name         String?        @db.VarChar(200)
-  git          String?        @db.VarChar(255)
-  GamesUsers   GamesUsers[]
-  UsersClasses UsersClasses[]
+    id        Int         @id @unique(map: "id") @default(autoincrement()) @db.UnsignedInt
+    name      String      @db.VarChar(200)
+    git       String?     @db.VarChar(255)
+    Games     GameUsers[]
+    UserClass UserClass[]
 }
 
-model UsersClasses {
-  id      Int  @id @unique(map: "id") @default(autoincrement()) @db.UnsignedInt
-  userId  Int? @db.UnsignedInt
-  classId Int? @db.UnsignedInt
-  User    User?   @relation(fields: [userId], references: [id], onDelete: Cascade, map: "UsersClasses_ibfk_1")
-  Class   Class?  @relation(fields: [classId], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "UsersClasses_ibfk_2")
-
-  @@index([classId], map: "classId")
-  @@index([userId], map: "userId")
+model GameTypes {
+    id     Int  @id @unique(map: "id") @default(autoincrement()) @db.UnsignedInt
+    game   Game @relation(fields: [gameId], references: [id])
+    type   Type @relation(fields: [typeId], references: [id])
+    gameId Int  @db.UnsignedInt
+    typeId Int  @db.UnsignedInt
 }
+
+model Type {
+    id    Int         @id @unique(map: "id") @default(autoincrement()) @db.UnsignedInt
+    type  String?     @db.VarChar(200)
+    Games GameTypes[]
+}
+
+model Score {
+    id        Int      @id @unique(map: "id") @default(autoincrement()) @db.UnsignedInt
+    score     Int      @default(0)
+    handle    String?  @db.VarChar(6)
+    createdAt DateTime @default(now()) @db.Timestamp(0)
+    updatedAt DateTime @default(now()) @db.Timestamp(0)
+    Game      Game     @relation(fields: [gameId], references: [id])
+    gameId    Int      @db.UnsignedInt
+}
+
+model Classcode {
+    id          Int           @id @unique(map: "id") @default(autoincrement()) @db.UnsignedInt
+    code        String        @db.VarChar(4)
+    users       UserClass[]
+    GameClasses GameClasses[]
+}
+
+model UserClass {
+    id        Int       @id @unique(map: "id") @default(autoincrement()) @db.UnsignedInt
+    user      User      @relation(fields: [userId], references: [id])
+    classcode Classcode @relation(fields: [classId], references: [id])
+    userId    Int       @db.UnsignedInt
+    classId   Int       @db.UnsignedInt
+}
+
+model GameClasses {
+    id      Int       @id @unique(map: "id") @default(autoincrement()) @db.UnsignedInt
+    game    Game      @relation(fields: [gameId], references: [id])
+    class   Classcode @relation(fields: [classId], references: [id])
+    gameId  Int       @db.UnsignedInt
+    classId Int       @db.UnsignedInt
+}
+
+// model GamesUsers {
+//     id     Int   @id @unique(map: "id") @default(autoincrement()) @db.UnsignedInt
+//     gameId Int?  @db.UnsignedInt
+//     userId Int?  @db.UnsignedInt
+//     Games  Game? @relation(fields: [gameId], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "GamesUsers_ibfk_1")
+//     Users  User? @relation(fields: [userId], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "GamesUsers_ibfk_2")
+
+//     @@index([gameId], map: "gameId")
+//     @@index([userId], map: "userId")
+// }
+
+// model Class {
+//     id           Int            @id @unique(map: "id") @default(autoincrement()) @db.UnsignedInt
+//     name         String         @db.VarChar(4)
+//     UsersClasses UsersClasses[]
+// }
+
+// model Game {
+//     id          Int          @id @unique(map: "id") @default(autoincrement()) @db.UnsignedInt
+//     title       String       @db.VarChar(200)
+//     url         String       @db.VarChar(255)
+//     git         String       @db.VarChar(255)
+//     year        Int
+//     description String?      @db.Text
+//     cover       String?      @db.VarChar(255)
+//     createdAt   DateTime     @default(now()) @db.Timestamp(0)
+//     updatedAt   DateTime     @default(now()) @db.Timestamp(0)
+//     GamesUsers  GamesUsers[]
+//     GamesTypes  GamesTypes[]
+//     Score       Score[]
+// }
+
+// model GamesTypes {
+//     id     Int   @id @unique(map: "id") @default(autoincrement()) @db.UnsignedInt
+//     gameId Int?  @db.UnsignedInt
+//     typeId Int?  @db.UnsignedInt
+//     Game   Game? @relation(fields: [gameId], references: [id])
+// }
+
+// model Score {
+//     id        Int      @id @unique(map: "id") @default(autoincrement()) @db.UnsignedInt
+//     gameId    Int      @db.UnsignedInt
+//     score     Int      @default(0)
+//     handle    String?  @db.VarChar(6)
+//     createdAt DateTime @default(now()) @db.Timestamp(0)
+//     updatedAt DateTime @default(now()) @db.Timestamp(0)
+//     Game      Game     @relation(fields: [gameId], references: [id], onDelete: Cascade, map: "Score_ibfk_1")
+
+//     @@index([gameId], map: "gameId")
+// }
+
+// model Type {
+//     id   Int     @id @unique(map: "id") @default(autoincrement()) @db.UnsignedInt
+//     type String? @db.VarChar(200)
+// }
+
+// model User {
+//     id           Int            @id @unique(map: "id") @default(autoincrement()) @db.UnsignedInt
+//     name         String?        @db.VarChar(200)
+//     git          String?        @db.VarChar(255)
+//     GamesUsers   GamesUsers[]
+//     UsersClasses UsersClasses[]
+// }
+
+// model UsersClasses {
+//     id      Int    @id @unique(map: "id") @default(autoincrement()) @db.UnsignedInt
+//     userId  Int?   @db.UnsignedInt
+//     classId Int?   @db.UnsignedInt
+//     User    User?  @relation(fields: [userId], references: [id], onDelete: Cascade, map: "UsersClasses_ibfk_1")
+//     Class   Class? @relation(fields: [classId], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "UsersClasses_ibfk_2")
+
+//     @@index([classId], map: "classId")
+//     @@index([userId], map: "userId")
+// }
