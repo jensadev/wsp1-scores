@@ -1,0 +1,42 @@
+-- CreateTable
+CREATE TABLE `Game` (
+    `id` INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+    `title` VARCHAR(200) NOT NULL,
+    `url` VARCHAR(255) NOT NULL,
+    `git` VARCHAR(255) NOT NULL,
+    `year` INTEGER NOT NULL,
+    `description` TEXT NULL,
+    `cover` VARCHAR(255) NULL,
+    `createdAt` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+    `updatedAt` TIMESTAMP(0) NOT NULL DEFAULT CURRENT_TIMESTAMP(0),
+
+    UNIQUE INDEX `id`(`id`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `GameUsers` (
+    `id` INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+    `gameId` INTEGER UNSIGNED NULL,
+    `userId` INTEGER UNSIGNED NULL,
+
+    UNIQUE INDEX `id`(`id`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `User` (
+    `id` INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+    `name` VARCHAR(200) NOT NULL,
+    `git` VARCHAR(255) NULL,
+
+    UNIQUE INDEX `id`(`id`),
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- AddForeignKey
+ALTER TABLE `GameUsers` ADD CONSTRAINT `GameUsers_gameId_fkey` FOREIGN KEY (`gameId`) REFERENCES `Game`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `GameUsers` ADD CONSTRAINT `GameUsers_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `User`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+

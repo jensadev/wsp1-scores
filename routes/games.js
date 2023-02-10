@@ -8,10 +8,16 @@ const prisma = new PrismaClient();
 const getAllGames = async () => {
     const allGames = await prisma.game.findMany({
         include: {
-            users: true,
-            types: true,
-            scores: true,
-            classes: true,
+            users: {
+                include: {
+                    user: true,
+                },
+            },
+            types: {
+                include: {
+                    type: true,
+                },
+            },
         },
     });
     return allGames;
@@ -51,14 +57,26 @@ router.get('/test', async (req, res) => {
             year: 2021,
             description: 'This is a test game',
             types: {
-                create: {
-                    type: 'Test Type',
-                },
+                create: [
+                    {
+                        type: {
+                            create: {
+                                type: 'Test Type',
+                            },
+                        },
+                    },
+                ],
             },
             users: {
-                create: {
-                    name: 'Test User',
-                },
+                create: [
+                    {
+                        user: {
+                            create: {
+                                name: 'Test User',
+                            },
+                        },
+                    },
+                ],
             },
         },
     });

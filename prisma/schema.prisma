@@ -8,19 +8,19 @@ datasource db {
 }
 
 model Game {
-    id          Int           @id @unique(map: "id") @default(autoincrement()) @db.UnsignedInt
-    title       String        @db.VarChar(200)
-    url         String        @db.VarChar(255)
-    git         String        @db.VarChar(255)
+    id          Int         @id @unique(map: "id") @default(autoincrement()) @db.UnsignedInt
+    title       String      @db.VarChar(200)
+    url         String      @db.VarChar(255)
+    git         String      @db.VarChar(255)
     year        Int
-    description String?       @db.Text
-    cover       String?       @db.VarChar(255)
-    createdAt   DateTime      @default(now()) @db.Timestamp(0)
-    updatedAt   DateTime      @default(now()) @db.Timestamp(0)
+    description String?     @db.Text
+    cover       String?     @db.VarChar(255)
+    createdAt   DateTime    @default(now()) @db.Timestamp(0)
+    updatedAt   DateTime    @default(now()) @db.Timestamp(0)
     users       GameUsers[]
     types       GameTypes[]
-    scores      Score[]
-    classes     GameClasses[]
+    // scores      Score[]
+    // classes     GameClasses[]
 }
 
 model GameUsers {
@@ -32,11 +32,11 @@ model GameUsers {
 }
 
 model User {
-    id        Int         @id @unique(map: "id") @default(autoincrement()) @db.UnsignedInt
-    name      String      @db.VarChar(200)
-    git       String?     @db.VarChar(255)
-    Games     GameUsers[]
-    UserClass UserClass[]
+    id    Int         @id @unique(map: "id") @default(autoincrement()) @db.UnsignedInt
+    name  String      @db.VarChar(200)
+    git   String?     @db.VarChar(255)
+    Games GameUsers[]
+    // UserClass UserClass[]
 }
 
 model GameTypes {
@@ -53,38 +53,38 @@ model Type {
     Games GameTypes[]
 }
 
-model Score {
-    id        Int      @id @unique(map: "id") @default(autoincrement()) @db.UnsignedInt
-    score     Int      @default(0)
-    handle    String?  @db.VarChar(6)
-    createdAt DateTime @default(now()) @db.Timestamp(0)
-    updatedAt DateTime @default(now()) @db.Timestamp(0)
-    Game      Game     @relation(fields: [gameId], references: [id])
-    gameId    Int      @db.UnsignedInt
-}
+// model Score {
+//     id        Int      @id @unique(map: "id") @default(autoincrement()) @db.UnsignedInt
+//     score     Int      @default(0)
+//     handle    String?  @db.VarChar(6)
+//     createdAt DateTime @default(now()) @db.Timestamp(0)
+//     updatedAt DateTime @default(now()) @db.Timestamp(0)
+//     Game      Game     @relation(fields: [gameId], references: [id])
+//     gameId    Int      @db.UnsignedInt
+// }
 
-model Classcode {
-    id          Int           @id @unique(map: "id") @default(autoincrement()) @db.UnsignedInt
-    code        String        @db.VarChar(4)
-    users       UserClass[]
-    GameClasses GameClasses[]
-}
+// model Classcode {
+//     id          Int           @id @unique(map: "id") @default(autoincrement()) @db.UnsignedInt
+//     code        String        @db.VarChar(4)
+//     users       UserClass[]
+//     GameClasses GameClasses[]
+// }
 
-model UserClass {
-    id        Int       @id @unique(map: "id") @default(autoincrement()) @db.UnsignedInt
-    user      User      @relation(fields: [userId], references: [id])
-    classcode Classcode @relation(fields: [classId], references: [id])
-    userId    Int       @db.UnsignedInt
-    classId   Int       @db.UnsignedInt
-}
+// model UserClass {
+//     id        Int       @id @unique(map: "id") @default(autoincrement()) @db.UnsignedInt
+//     user      User      @relation(fields: [userId], references: [id])
+//     classcode Classcode @relation(fields: [classId], references: [id])
+//     userId    Int       @db.UnsignedInt
+//     classId   Int       @db.UnsignedInt
+// }
 
-model GameClasses {
-    id      Int       @id @unique(map: "id") @default(autoincrement()) @db.UnsignedInt
-    game    Game      @relation(fields: [gameId], references: [id])
-    class   Classcode @relation(fields: [classId], references: [id])
-    gameId  Int       @db.UnsignedInt
-    classId Int       @db.UnsignedInt
-}
+// model GameClasses {
+//     id      Int       @id @unique(map: "id") @default(autoincrement()) @db.UnsignedInt
+//     game    Game      @relation(fields: [gameId], references: [id])
+//     class   Classcode @relation(fields: [classId], references: [id])
+//     gameId  Int       @db.UnsignedInt
+//     classId Int       @db.UnsignedInt
+// }
 
 // model GamesUsers {
 //     id     Int   @id @unique(map: "id") @default(autoincrement()) @db.UnsignedInt
