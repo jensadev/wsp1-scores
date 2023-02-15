@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
+const { PrismaClient } = require('@prisma/client');
 
+const prisma = new PrismaClient();
 // GET home page
 router.get('/', (req, res) => {
     return res.status(400).json({
@@ -10,21 +12,35 @@ router.get('/', (req, res) => {
     });
 });
 
-// router.get('/:gameId', async (req, res) => {
-//     const { gameId } = req.params;
-//     const errors = [];
-//     if (gameId === undefined) {
-//         errors.push({ msg: 'gameId is required' });
-//     }
-//     if (isNaN(gameId)) {
-//         errors.push({ msg: 'gameId must be a number' });
-//     }
+router.get('/:gameId', async (req, res) => {
+    const { gameId } = req.params;
+    const errors = [];
+    if (gameId === undefined) {
+        errors.push({ msg: 'gameId is required' });
+    }
+    if (isNaN(gameId)) {
+        errors.push({ msg: 'gameId must be a number' });
+    }
 
-//     if (errors.length > 0) {
-//         return res
-//             .status(400)
-//             .json({ msg: 'fail', url: req.originalUrl, errors });
-//     }
+    if (errors.length > 0) {
+        return res
+            .status(400)
+            .json({ msg: 'fail', url: req.originalUrl, errors });
+    }
+
+    const scores = await prisma.score.findMany({
+        where: {
+            gameId: parseInt(gameId),
+        },
+    });
+
+    return res.json({
+        msg: 'success',
+        url: req.originalUrl,
+        gameId: gameId,
+        scores: scores || [],
+    });
+});
 
 //     try {
 //         const [rows] = await promisePool.query(

@@ -60,8 +60,13 @@ router.get('/test', async (req, res) => {
                 create: [
                     {
                         type: {
-                            create: {
-                                type: 'Test Type',
+                            connectOrCreate: {
+                                where: {
+                                    type: 'Clicker',
+                                },
+                                create: {
+                                    type: 'Clicker',
+                                },
                             },
                         },
                     },
@@ -71,8 +76,13 @@ router.get('/test', async (req, res) => {
                 create: [
                     {
                         user: {
-                            create: {
-                                name: 'Test User',
+                            connectOrCreate: {
+                                where: {
+                                    name: 'JensA',
+                                },
+                                create: {
+                                    name: 'JensA',
+                                },
                             },
                         },
                     },
@@ -87,28 +97,48 @@ router.get('/test', async (req, res) => {
     });
 });
 
-// router.get('/:gameId', async (req, res) => {
-//     const { gameId } = req.params;
-//     const errors = [];
-//     if (gameId === undefined) {
-//         errors.push({ msg: 'gameId is required' });
-//     }
-//     if (isNaN(gameId)) {
-//         errors.push({ msg: 'gameId must be a number' });
-//     }
+router.get('/:gameId', async (req, res) => {
+    const { gameId } = req.params;
+    const errors = [];
+    if (gameId === undefined) {
+        errors.push({ msg: 'gameId is required' });
+    }
+    if (isNaN(gameId)) {
+        errors.push({ msg: 'gameId must be a number' });
+    }
 
-//     if (errors.length > 0) {
-//         return res
-//             .status(400)
-//             .json({ msg: 'fail', url: req.originalUrl, errors });
-//     }
+    if (errors.length > 0) {
+        return res
+            .status(400)
+            .json({ msg: 'fail', url: req.originalUrl, errors });
+    }
 
-//     res.json({
-//         msg: 'success',
-//         url: req.originalUrl,
-//         gameId: gameId,
-//         data: [],
-//     });
-// });
+    const game = await prisma.game.findUnique({
+        where: {
+            id: parseInt(gameId),
+        },
+        include: {
+            users: {
+                include: {
+                    user: true,
+                },
+            },
+            types: {
+                include: {
+                    type: true,
+                },
+            },
+        },
+    });
+
+    console.log(gameId, game);
+
+    res.json({
+        msg: 'success',
+        url: req.originalUrl,
+        gameId: gameId,
+        data: game,
+    });
+});
 
 module.exports = router;

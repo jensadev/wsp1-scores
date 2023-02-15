@@ -6,35 +6,49 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 describe('/games', () => {
+    let testGame;
     beforeAll(async () => {
-        try {
-            prisma.game.create({
-                data: {
-                    title: 'Test Game',
-                    url: 'https://www.testgame.com',
-                    git: 'https://www.testgame.com',
-                    year: 2021,
-                    description: 'This is a test game',
-                    types: {
-                        create: {
-                            type: 'Test Type',
+        testGame = await prisma.game.create({
+            data: {
+                title: 'Test Game',
+                url: 'https://www.testgame.com',
+                git: 'https://www.testgame.com',
+                year: 2021,
+                description: 'This is a test game',
+                types: {
+                    create: [
+                        {
+                            type: {
+                                connectOrCreate: {
+                                    where: {
+                                        type: 'Test type',
+                                    },
+                                    create: {
+                                        type: 'Test type',
+                                    },
+                                },
+                            },
                         },
-                    },
-                    users: {
-                        create: {
-                            name: 'Test User',
-                        },
-                    },
-                    classes: {
-                        create: {
-                            name: 'Test Class',
-                        },
-                    },
+                    ],
                 },
-            });
-        } catch (error) {
-            console.log(error);
-        }
+                users: {
+                    create: [
+                        {
+                            user: {
+                                connectOrCreate: {
+                                    where: {
+                                        name: 'Test user',
+                                    },
+                                    create: {
+                                        name: 'Test user',
+                                    },
+                                },
+                            },
+                        },
+                    ],
+                },
+            },
+        });
     });
 
     describe('GET /', () => {
@@ -46,32 +60,44 @@ describe('/games', () => {
             return supertest(app)
                 .get('/games')
                 .then((response) => {
-                    expect(response.body.games).toEqual([]);
+                    // console.log(response.body.games);
+                    expect(response.body.games).toBeInstanceOf(Array);
                 });
         });
     });
 
-    // describe('GET /:gameId', () => {
-    //     it('should return 200 OK', () => {
-    //         return supertest(app).get('/games/123456').expect(200);
-    //     });
+    describe('GET /:gameId', () => {
+        it('should return 200 OK', () => {
+            return supertest(app).get(`/games/${testGame.id}`).expect(200);
+        });
 
-    //     it('should return game data', () => {
-    //         return supertest(app)
-    //             .get('/games/123456')
-    //             .then((response) => {
-    //                 expect(response.body.data).toEqual([]);
-    //             });
-    //     });
+        it('should return game data', () => {
+            console.log(testGame.id);
+            return supertest(app)
+                .get(`/games/${testGame.id}`)
+                .then((response) => {
+                    console.log(response.body);
+                    expect(response.body.data).toBeInstanceOf(Object);
+                });
+        });
 
-    //     it('should return an error if gameId is not a number', () => {
-    //         return supertest(app)
-    //             .get('/games/abc')
-    //             .then((response) => {
-    //                 expect(response.body.errors[0].msg).toBe(
-    //                     'gameId must be a number'
-    //                 );
-    //             });
-    //     });
+        it('should return an error if gameId is not a number', () => {
+            return supertest(app)
+                .get('/games/abc')
+                .then((response) => {
+                    expect(response.body.errors[0].msg).toBe(
+                        'gameId must be a number'
+                    );
+                });
+        });
+    });
+
+    // afterAll(async () => {
+    //     await prisma.gameUsers.deleteMany();
+    //     await prisma.gameTypes.deleteMany();
+    //     await prisma.type.deleteMany();
+    //     await prisma.user.deleteMany();
+    //     await prisma.game.deleteMany();
+    //     await prisma.$disconnect();
     // });
 });

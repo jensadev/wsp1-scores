@@ -19,7 +19,7 @@ model Game {
     updatedAt   DateTime    @default(now()) @db.Timestamp(0)
     users       GameUsers[]
     types       GameTypes[]
-    // scores      Score[]
+    scores      Score[]
     // classes     GameClasses[]
 }
 
@@ -33,7 +33,7 @@ model GameUsers {
 
 model User {
     id    Int         @id @unique(map: "id") @default(autoincrement()) @db.UnsignedInt
-    name  String      @db.VarChar(200)
+    name  String      @unique @db.VarChar(200)
     git   String?     @db.VarChar(255)
     Games GameUsers[]
     // UserClass UserClass[]
@@ -49,19 +49,19 @@ model GameTypes {
 
 model Type {
     id    Int         @id @unique(map: "id") @default(autoincrement()) @db.UnsignedInt
-    type  String?     @db.VarChar(200)
+    type  String      @unique @db.VarChar(200)
     Games GameTypes[]
 }
 
-// model Score {
-//     id        Int      @id @unique(map: "id") @default(autoincrement()) @db.UnsignedInt
-//     score     Int      @default(0)
-//     handle    String?  @db.VarChar(6)
-//     createdAt DateTime @default(now()) @db.Timestamp(0)
-//     updatedAt DateTime @default(now()) @db.Timestamp(0)
-//     Game      Game     @relation(fields: [gameId], references: [id])
-//     gameId    Int      @db.UnsignedInt
-// }
+model Score {
+    id        Int      @id @unique(map: "id") @default(autoincrement()) @db.UnsignedInt
+    score     Int      @default(0)
+    handle    String?  @db.VarChar(6)
+    gameId    Int      @unique @db.UnsignedInt
+    createdAt DateTime @default(now()) @db.Timestamp(0)
+    updatedAt DateTime @default(now()) @db.Timestamp(0)
+    Game      Game     @relation(fields: [gameId], references: [id])
+}
 
 // model Classcode {
 //     id          Int           @id @unique(map: "id") @default(autoincrement()) @db.UnsignedInt
