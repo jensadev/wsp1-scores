@@ -4,27 +4,31 @@ const { response } = require('../app');
 const { PrismaClient } = require('@prisma/client');
 
 const prisma = new PrismaClient();
+const { faker } = require('@faker-js/faker');
 
 describe('/scores', () => {
     let testGame;
     beforeAll(async () => {
+        const gameType = faker.word.noun();
+        const gameUser = `${faker.name.firstName()} ${faker.name.lastName()}`;
+
         testGame = await prisma.game.create({
             data: {
-                title: 'Test Game',
-                url: 'https://www.testgame.com',
-                git: 'https://www.testgame.com',
-                year: 2021,
-                description: 'This is a test game',
+                title: `${faker.word.adjective()} ${faker.word.noun()}`,
+                url: `https://${faker.internet.domainName()}`,
+                git: 'https://github.com',
+                year: faker.date.past().getFullYear(),
+                description: faker.hacker.phrase(),
                 types: {
                     create: [
                         {
                             type: {
                                 connectOrCreate: {
                                     where: {
-                                        type: 'Score test type',
+                                        type: gameType,
                                     },
                                     create: {
-                                        type: 'Score test type',
+                                        type: gameType,
                                     },
                                 },
                             },
@@ -37,10 +41,10 @@ describe('/scores', () => {
                             user: {
                                 connectOrCreate: {
                                     where: {
-                                        name: 'Score test user',
+                                        name: gameUser,
                                     },
                                     create: {
-                                        name: 'Score test user',
+                                        name: gameUser,
                                     },
                                 },
                             },
@@ -51,15 +55,15 @@ describe('/scores', () => {
                     create: [
                         {
                             score: 100,
-                            handle: '1337',
+                            handle: faker.internet.userName(),
                         },
                         {
                             score: 200,
-                            handle: 'tuff',
+                            handle: faker.internet.userName(),
                         },
                         {
                             score: 300,
-                            handle: 'jens',
+                            handle: faker.internet.userName(),
                         },
                     ],
                 },

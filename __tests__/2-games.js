@@ -5,26 +5,31 @@ const { PrismaClient } = require('@prisma/client');
 
 const prisma = new PrismaClient();
 
+const { faker } = require('@faker-js/faker');
+
 describe('/games', () => {
     let testGame;
     beforeAll(async () => {
+        const gameType = faker.word.noun();
+        const gameUser = `${faker.name.firstName()} ${faker.name.lastName()}`;
+
         testGame = await prisma.game.create({
             data: {
-                title: 'Test Game',
-                url: 'https://www.testgame.com',
-                git: 'https://www.testgame.com',
-                year: 2021,
-                description: 'This is a test game',
+                title: `${faker.word.adjective()} ${faker.word.noun()}`,
+                url: `https://${faker.internet.domainName()}`,
+                git: 'https://github.com',
+                year: faker.date.past().getFullYear(),
+                description: faker.hacker.phrase(),
                 types: {
                     create: [
                         {
                             type: {
                                 connectOrCreate: {
                                     where: {
-                                        type: 'Test type',
+                                        type: gameType,
                                     },
                                     create: {
-                                        type: 'Test type',
+                                        type: gameType,
                                     },
                                 },
                             },
@@ -37,10 +42,10 @@ describe('/games', () => {
                             user: {
                                 connectOrCreate: {
                                     where: {
-                                        name: 'Test user',
+                                        name: gameUser,
                                     },
                                     create: {
-                                        name: 'Test user',
+                                        name: gameUser,
                                     },
                                 },
                             },
@@ -60,7 +65,6 @@ describe('/games', () => {
             return supertest(app)
                 .get('/games')
                 .then((response) => {
-                    // console.log(response.body.games);
                     expect(response.body.games).toBeInstanceOf(Array);
                 });
         });
@@ -72,11 +76,9 @@ describe('/games', () => {
         });
 
         it('should return game data', () => {
-            console.log(testGame.id);
             return supertest(app)
                 .get(`/games/${testGame.id}`)
                 .then((response) => {
-                    console.log(response.body);
                     expect(response.body.data).toBeInstanceOf(Object);
                 });
         });

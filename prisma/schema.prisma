@@ -56,8 +56,8 @@ model Type {
 model Score {
     id        Int      @id @unique(map: "id") @default(autoincrement()) @db.UnsignedInt
     score     Int      @default(0)
-    handle    String?  @db.VarChar(6)
-    gameId    Int      @unique @db.UnsignedInt
+    handle    String?  @db.VarChar(20)
+    gameId    Int      @db.UnsignedInt
     createdAt DateTime @default(now()) @db.Timestamp(0)
     updatedAt DateTime @default(now()) @db.Timestamp(0)
     Game      Game     @relation(fields: [gameId], references: [id])

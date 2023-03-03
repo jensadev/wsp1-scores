@@ -131,8 +131,6 @@ router.get('/:gameId', async (req, res) => {
         },
     });
 
-    console.log(gameId, game);
-
     res.json({
         msg: 'success',
         url: req.originalUrl,
